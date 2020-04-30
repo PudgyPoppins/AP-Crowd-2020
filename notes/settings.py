@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'xhpe^oa6c6su+msn3ej6--w08%n0o@
 #DEBUG = True
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'apcrowd2020.com', 'http://apcrowd2020.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'apcrowd2020.com', 'www.apcrowd2020.com', 'blooming-coast-63759.herokuapp.com']
 
 
 # Application definition
