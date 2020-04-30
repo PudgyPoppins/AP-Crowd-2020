@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block not_content %}
+<section class="hero is-link is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        AP Crowd 2020
+      </h1>
+      <h2 class="subtitle">
+        A crowdsourced notes application for this year's AP students
+      </h2>
+    </div>
+  </div>
+</section>
+<div class="content">
+	<div class="btnWrapper">
+		<a class="button is-large" href="{% url 'wiki:course_list' %}">Get the notes!</a>
+		{% if not user.is_authenticated %}
+		<a class="button is-large" href="{% url 'accounts:signup' %}">Add your own</a>
+		{% endif %}
+	</div>
+	<h1 class="title">How it works</h1>
+	<ol class="bigList">
+		<li>Students add their notes to the site</li>
+		<li>Other students contribute to these pages and verify the information</li>
+		<li>????</li>
+		<li>You get a 5 on your AP exams 🤞</li>
+	</ol>
+</div>
+<div class="faqWrapper">
+	<div class="content">
+	<h1>FAQ</h1>
+
+	<button class="accordion">Are there any rules?</button>
+	<div class="panel">
+		<p>Yes!</p>
+		<ol>
+			<li>Be kind.</li>
+			<li>Please don't cheat on your exams.</li>
+			<li>Don't create pages that are off topic or offensive. If you want to create a test page, you can <a href="{% url 'wiki:page_detail' 'help/testing/' %}">do so here</a>.</li>
+		</ol>
+	</div>
+
+	<button class="accordion">Is this endorsed in any way by Collegeboard?</button>
+	<div class="panel">
+		<p>No, and it likely won't be. This is a student ran site for other students to help us all prepare for our AP exams.</p>
+		<p>That would be cool though, wouldn't it.</p>
+	</div>
+
+	<button class="accordion">Is this considered cheating? Can Collegeboard see if I use this site?</button>
+	<div class="panel">
+		<p>As of now, there is no evidence whatsoever and very little feasibility that Collegeboard could track student searches. There are a myriad of other sites that students could better cheat on. This is simply an educational site designed to prepare students for their exams. If you want to download these notes or print them before test day, that's your choice! This site is planned to run throughout and during this years' exams.</p>
+	</div>
+
+	<button class="accordion">How do I add my notes?</button>
+	<div class="panel">
+		<p>Go to a course and see if you can create a page there or in one of its units. If you can't, it's likely because the page was locked, or you don't have specific permisissions needed. If you want to edit a locked page, you can report it, and our team will consider reopening it up for access.</p>
+		<p>The site uses a Markdown based editor. If you have trouble using it, you can read <a href="{% url 'wiki:page_detail' 'help/editor-help/' %}">the editor guide</a>.</p>
+	</div>
+
+	<button class="accordion">How are notes protected?</button>
+	<div class="panel">
+		<p>If you see notes that are misleading, trollish, or just plain wrong, please report it! Each report notifies our team immediately and is then carefully looked at. Thank you for keeping <i>AP Crowd</i> the resource that it is!</p>
+		<p>Furthermore, each note/page has one of 4 tiers of protection: none, confirmed users only, locked, and locked with no children.</p>
+		<ul>
+			<li>None: All users can edit</li>
+			<li>Confimred users only: Only users that have had an account for more than five days are able to edit</li>
+			<li>Locked: Only the user that locked the note can edit</li>
+			<li>Locked with no children: Only the user that added this protection can edit the note, and add sub-pages</li>
+		</ul>
+		<p>Protections can be added by users or staff.</p>
+	</div>
+
+	<button class="accordion">I noticed a bug, or I have a suggestion!</button>
+	<div class="panel">
+		<p>I'm sure the site has loads of room for improvement. Bugs can be emailed to us (apcrowd2020 at gmail dot com) or listed under the "Issues" section of our <a href="https://github.com/PudgyPoppins/AP-Crowd-2020" target="_blank">Github</a>. Suggestions are also welcome in the inbox or in our <a href="https://discord.gg/cH2gT97" target="_blank">Discord</a>. I want this to be the best resource that it can be, so if you have any input, I'd love to hear it!</p>
+	</div>
+
+	<button class="accordion">This sounds cool! Can I help?</button>
+	<div class="panel">
+		<p>First and foremost, please add your notes! If you want to help in other ways, you can contribute to our <a href="https://github.com/PudgyPoppins/AP-Crowd-2020" target="_blank">Github</a> or help on our <a href="https://discord.gg/cH2gT97" target="_blank">Discord</a>. The site runs on Django (a Python framework for web applications) and through sheer force of will.</p>
+	</div>
+	</div>
+</div>
+<style>.pageWrapper{display:none}</style>
+
+	<script>
+	var acc = document.getElementsByClassName("accordion");
+	var i;
+
+	for (i = 0; i < acc.length; i++) {
+	  acc[i].addEventListener("click", function() {
+	    this.classList.toggle("active");
+	    var panel = this.nextElementSibling;
+	    if (panel.style.maxHeight) {
+	      panel.style.maxHeight = null;
+	    } else {
+	      panel.style.maxHeight = panel.scrollHeight + "px";
+	    } 
+	  });
+	}
+	</script>
+</div>
+{% endblock %}

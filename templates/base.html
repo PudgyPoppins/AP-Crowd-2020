@@ -1,0 +1,192 @@
+{% load static %}
+{% load custom_filters %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
+{% load compress %}
+
+{% localtime on %}
+<!DOCTYPE html>
+<html id="html">
+<head>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-165036627-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-165036627-1');
+	</script>
+
+	<link href="{% static 'images/favicon.ico' %}" rel="shortcut icon" type="image/png" />
+
+	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+	<link rel="manifest" href="{% static 'images/site.webmanifest' %}">
+
+	<meta charset="UTF-8">
+	<meta name="description" content="AP Crowd 2020 is a place for students to share crowdsourced notes for this year's AP exams.">
+	<meta name="keywords" content="ap, ap crowd 2020, crowdsourced, notes, ap crowd">
+	<meta name="author" content="AP Crowd Developer">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:description" content="AP Crowd 2020 is a place for students to share crowdsourced notes for this year's AP exams.">
+
+	<title>AP Crowd {% block title %}{% endblock %}</title>
+
+	{% compress css %}
+	<link type="text/x-sass" href="{% static 'css/bulma.sass' %}" rel="stylesheet">
+    <link type="text/x-scss" href="{% static 'css/style.scss' %}" rel="stylesheet">
+	{% endcompress %}
+	<link type="text/css" href="{% static 'css/tooltip.css' %}" rel="stylesheet">
+	<link type="text/css" href="{% static 'css/highlight-styles/a11y.css' %}" rel="stylesheet">
+
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.0.0/build/highlight.min.js"></script>
+</head>
+
+<body>
+	<div class="notFooter">
+	{% include "navbar.html" %}
+	
+	{% if messages %}
+	<ul class="messages">
+	    {% for message in messages %}
+	    <li{% if message.tags %} class="notification {% if message.tags == 'error' %}is-danger{% else %}is-{{ message.tags }}{% endif %}"{% endif %}>
+	    	<button class="delete is-medium" onclick="removeNotification(this)"></button>{{ message }}
+		</li>
+	    {% endfor %}
+	</ul>
+	{% endif %}
+
+	{% block not_content %}
+	{% endblock %}
+
+	{% if on_detail_view %}
+	<div class="bigWrapper">
+		<div class="sideWrapper">
+			{% if page and page != course %}
+			<div class="toc"><span>{{ page.title }}</span>{{ page.content|markdown_toc }}</div>
+				{% if page.child.all %}
+					<div class="toc">
+						<span>Sub pages</span>
+						<ul>
+							{% if page.child.all %}
+							{% for c in page.child.all %}
+							<li><a href="{% url 'wiki:page_detail' c.get_url %}">{{ c.title }}</a></li>
+							{% endfor %}
+							{% elif user.is_authenticated and page.protection != "NC" or page.protection == "NC" and page.created_by == user %}
+							<li>There aren't any sub pages here! <a href="{% url 'wiki:page_create' page.get_url %}">Create a sub page</a></li>
+							{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+				<div class="toc">
+					<span>Other pages at this level</span>
+					<ul>
+						{% if page.parent.child.all %}
+						{% for c in page.parent.child.all %}
+							{% if c != page %}<li><a href="{% url 'wiki:page_detail' c.get_url %}">{{ c.title }}</a></li>{% endif %}
+						{% endfor %}
+						{% elif user.is_authenticated and page.parent.protection != "NC" or page.parent.protection == "NC" and page.parent.created_by == user %}
+						<li>There aren't any other pages here! <a href="{% url 'wiki:page_create' page.parent.get_url %}">Create another page</a></li>
+						{% endif %}
+					</ul>
+				</div>
+			{% else %}
+			<div class="toc">
+				<span>All courses</span>
+				<ul>
+					{% for c in course_list %}
+					<li>
+						<a href="{% url 'wiki:course_page' c.slug %}">{{ c.title }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<div class="toc">
+				<span>Units</span>
+				<ul>
+					{% for u in course.child.all %}
+					<li>
+						<a href="{% url 'wiki:page_detail' u.get_url %}">{{ u.title }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+			{% endif %}
+			<div class="toc">
+				<span>Print/export</span>
+				<ul>
+					<li><a href="#" onclick="window.print();return false;">Printable version</a></li>
+					<li>For a PDF, use the <a href="#" onclick="window.print();return false;">above link</a>, and, when prompted, change "Destination" to "Save as PDF"</li>
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+
+	<div class="pageWrapper">
+		<div class="content">
+		{% block content %}
+		{% endblock %}
+		</div>
+	</div>
+
+	{% if page or course %}
+	</div>
+	{% endif %}
+	</div>
+
+	<footer>
+	  <div class="content">
+	  	<p>AP® is a registered trademark of the College Board, which has not reviewed this resource.</p>
+	    <p>
+	      The <a href="https://github.com/PudgyPoppins/AP-Crowd-2020" target="_blank">source code</a> for <strong>AP Crowd 2020</strong> is licensed under
+	      <a href="http://opensource.org/licenses/mit-license.php" target="_blank">MIT</a>. The website content
+	      is licensed <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
+	    </p>
+	  </div>
+	  <div class="shareWrapperWrapper">
+		  <div class="shareWrapper">
+		  	<a href="https://discord.gg/cH2gT97" target="_blank"><i class="fab fa-discord icn"></i>Join our Discord</a>
+		  	<a href="" target="_blank"><i class="fab fa-github icn"></i>Watch our Github</a>
+		  </div>
+		  <div class="shareWrapper">
+		  	<a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fapcrowd2020.com" target="_blank"><i class="fab fa-facebook icn"></i>Facebook</a>
+		  	<a href="https://www.reddit.com/submit?url=http%3A%2F%2Fapcrowd2020.com&amp;title=AP%20Crowd%202020" target="_blank"><i class="fab fa-reddit icn"></i>Reddit</a>
+		  	<a href="https://twitter.com/intent/tweet?url=http%3A%2F%2Fapcrowd2020.com&amp;text=AP%20Crowd%202020%3A%20A%20crowdsourced%20notes%20application%20for%20this%20year's%20AP%20exams" target="_blank"><i class="fab fa-twitter icn"></i>Twitter</a>
+		  </div>
+		</div>
+	</footer>
+
+
+	<link rel="stylesheet" href="{% static 'css/katex.min.css' %}">
+	<script src="{% static 'js/katex.min.js' %}"></script>
+	<script src="{% static 'js/auto-render.min.js' %}"></script>
+
+	<script>
+		var delimiters = [
+		  {left: "$$", right: "$$", display: true},
+		  {left: "\\(", right: "\\)", display: false},
+		  {left: "\\[", right: "\\]", display: true}
+		]
+		var ignoredTags = ["script", "noscript", "style", "textarea",]
+		var options = {delimeters:delimiters, ignoredTags:ignoredTags, ignoredClasses:[":not(.math)"]};
+		function katexMath(){
+			renderMathInElement(document.body, options);
+		}
+		document.addEventListener('DOMContentLoaded', (event) => {
+		  document.querySelectorAll('pre code').forEach((block) => {
+		    hljs.highlightBlock(block);
+		  });
+		  katexMath();
+		});
+
+		function removeNotification(el){
+			el.parentNode.parentNode.removeChild(el.parentNode)
+		}
+	</script>
+</body>
+</html>
+{% endlocaltime %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+<h1 class="title">{{ page.title }}</h1>
+
+<p><a href="{% url 'wiki:course_page' course.slug %}"><i class="fas fa-arrow-left arr"></i>back to {{ course.title }}</a></p>
+{% if page.parent != course %}<p><a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-arrow-left arr"></i>back to {{ page.parent.title }}</a></p>{% endif %}
+
+<p class="protection">Page protection:
+{% if page.protection == "LO" %}<i class="fas fa-lock icn"></i>Locked <span data-tooltip="Only the user who locked this page can edit it" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif page.protection == "NC" %}<i class="fas fa-lock icn"></i>Locked and doesn't allow children <span data-tooltip="Only the user who locked this page can edit it, and no more pages can be added here" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif page.protection == "CO" %}<i class="fas fa-lock icn"></i>Confirmed users only <span data-tooltip="Only users who have had an account for 5 days can edit this page" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif page.protection == "NO" %}<i class="fas fa-unlock icn"></i>None <span data-tooltip="All signed in users can edit this page" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% endif %}
+</p>
+
+<div class="linkWrapper">
+	<a class="active" href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-eye icn"></i>view</a>
+	{% if page.protection != "LO" and page.protection != "NC" or page.protection == "NC" and user == page.created_by or page.protection == "LO" and user == page.created_by or user.is_staff %}
+	<a href="{% url 'wiki:page_update' page.get_url %}"><i class="fas fa-pen icn"></i>update</a>
+	<a href="{% url 'wiki:page_delete' page.get_url %}"><i class="fas fa-trash icn"></i>delete</a>
+	<a href="{% url 'wiki:page_move' page.get_url %}"><i class="fas fa-arrows-alt icn"></i>move</a>
+	{% endif %}
+	{% if user.is_authenticated %}<a href="{% url 'wiki:page_clone' course.get_url %}"><i class="fas fa-clone icn"></i>clone</a>{% endif %}
+	<a href="{% url 'wiki:page_report' page.get_url %}"><i class="fas fa-flag icn"></i>report</a>
+	<a href="{% url 'wiki:history' page.get_url %}"><i class="fas fa-history icn"></i>revision history</a>
+	<a href="{% url 'wiki:page_source' page.get_url %}"><i class="fas fa-code icn"></i>view source</a>
+</div>
+
+{% if user.is_authenticated and page.protection == "NO" or user.is_confirmed and page.protection == "CO" or page.created_by == user and page.protection == "LO" or page.created_by == user and page.protection == "NC" %}
+{% else %}
+<p>This page has been locked and can no longer be edited.</p> 
+<p>If you believe this page page would benefit from more information, you can <a href="{% url 'wiki:page_report' page.get_url %}">file a report</a> against it.</p>
+{% endif %}
+
+{% if user.is_authenticated %}
+	<div class="linkWrapper">
+	{% if page.parent and page.parent.created_by == user and page.parent.protection == "NC" or page.parent.protection != "NC" %}
+	<a href="{% url 'wiki:page_create' page.parent.get_url %}"><i class="fas fa-arrow-left icn"></i>Create a new page at this level (below {{ page.parent }})</a>
+	{% endif %}
+
+	{% if page.protection != "NC" or page.protection == "NC" and user == page.created_by %}
+	<a href="{% url 'wiki:page_create' page.get_url %}"><i class="fas fa-arrow-down icn"></i>Create a new page below this one</a>
+	{% endif %}
+	</div>
+{% else %}
+<p><a href="{% url 'accounts:login' %}">Log in</a> or <a href="{% url 'accounts:signup' %}">sign up</a> to create a new page!</p>
+{% endif %}
+
+{% if r %}<p>Last edited by: <a href="{% url 'accounts:profile' r.created_by.username %}">{{ r.created_by }}</a>, {{ r.created_date|timesince }} ago</p>{% endif %}
+
+{% if page.child.all %}
+<h2>Sub pages</h2>
+<ul>
+	{% for c in page.child.all %}
+	<li><a href="{% url 'wiki:page_detail' c.get_url %}">{{ c.title }}</a></li>
+	{% endfor %}
+</ul>
+{% endif %}
+
+<hr>
+<div class="toc"><span>{{ page.title }}</span>{{ page.content|markdown_toc }}</div>
+<div class="pageContent">{{ page.content|markdownify }}</div>
+{% endblock %}

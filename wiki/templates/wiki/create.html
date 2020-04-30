@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Create a new page{% endblock %}
+
+{% block not_content %}
+{% if page %}<p><a href="{% url 'wiki:page_detail' page.get_url %}" style="margin-left:1.5rem">back to parent</a></p>
+{% else %}<p><a href="{% url 'wiki:course_list' %}" style="margin-left:1.5rem">back to course list</a></p>
+{% endif %}
+{% include "wiki/snippets/page_form.html" with title=title %}
+{% endblock %}

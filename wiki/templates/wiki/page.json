@@ -1,0 +1,14 @@
+[
+  {
+    "title": "{{ page.title|escapejs }}",
+    "protection": "{{ page.protection }}",
+    "created_by": "{{ page.created_by.username }}",
+    {% if page.parent %}
+    "parent": [{"title": "{{ page.parent.title|escapejs }}", "slug": "{{ page.parent.slug|escapejs }}", "protection": "{{ page.parent.protection }}"}],
+    {% endif %}
+  	{% if page.child.all %}
+    "children": [{% for c in page.child.all %}{ "title":"{{ c.title|escapejs }}", "slug":"{{ c.slug|escapejs }}", "protection":"{{ c.protection }}" }{% if forloop.counter != page.child.all.count  %},{% endif %}{%endfor%}],
+    {% endif %}
+    "slug": "{{ page.slug|escapejs }}"
+  }
+]

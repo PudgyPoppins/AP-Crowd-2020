@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+
+{% block not_content %}
+<section class="hero is-link is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        AP Crowd 2020
+      </h1>
+      <h2 class="subtitle">
+        A crowdsourced notes application for this year's AP students
+      </h2>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<h1 class="title">Recommended reading</h1>
+<a href="{% url 'wiki:course_page' 'help' %}">
+	<div class="revision">
+   		<span style="color:#25d">How to use this site</span>
+	</div>
+</a>
+
+<h1>All Courses</h1>
+{% if course_list %}
+    {% for c in course_list %}
+    	<a href="{% url 'wiki:course_page' c.slug %}">
+    		<div class="revision">
+	       		<span style="color:#25d">{{ c.title }}</span>
+	    	</div>
+        </a>
+    {% endfor %}
+{% else %}
+    <p>An error occured with our database and we cannot render a list of courses right now.</p>
+{% endif %}
+<p>If you'd like a new course to be added, you can email apcrowd2020 at gmail dot com.</p>
+
+{% endblock %}

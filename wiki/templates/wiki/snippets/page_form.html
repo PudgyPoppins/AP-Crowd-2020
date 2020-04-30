@@ -1,0 +1,114 @@
+{% load static %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
+
+<div class="previewWrapper">
+
+<div class="box">
+	<h1>{{ title }}</h1>
+	<form method="post">{% csrf_token %}
+		{% for field in form %}
+			<p>
+				{{ field.errors }} 
+				{{ field.label_tag }}
+				<div class="formRow">
+					{% if field.name == "slug" %}
+
+						{% if field.name == "slug" and not clone and not create %}<strong>Changing the slug will destroy all links associated with this page. Proceed with caution!</strong>{% endif %}
+
+						<div class="field has-addons"><span class="control"><a class="button is-static">{% if page.parent and not clone %}{{ page.parent.get_absolute_url }}{% elif create %}{{ page.get_absolute_url }}{% endif %}</a></span><span class="control is-expanded">{{ field }}</span></div>
+						{% elif field.name == "protection" %}<div class="select is-fullwidth">{{ field }}</div>
+
+					{% else %} {{ field }}
+					{% endif %}
+					{% if field.help_text %}
+					<span data-tooltip="{{ field.help_text|safe }}" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+					<span class="helptext is-hidden-desktop">{{ field.help_text|safe }}</span>
+					{% endif %}
+				</div>
+				{% if not field.field.required %}
+				<i>(optional)</i>
+				{% endif %}
+			</p>
+			{% if field.name == "slug" and clone %}<p class="moveWrapper">{% include "wiki/snippets/move_snippet.html" %}</p>{% endif %}
+		{% endfor %}
+
+		<p><i>By submitting this form, you irrevocably agree to release your contribution under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0 License</a><span style="margin-left:5px" data-tooltip="This means that while your contribution is available for others to use and reuse, they can't use it for commercial purposes." class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>. 
+		You agree that a hyperlink or URL is sufficient attribution under the Creative Commons license.</i></p>
+		
+		<p><span class="helptext is-hidden-desktop">This means that while your contribution is available for others to use and reuse, they can't use it for commercial purposes</span></p>
+		<div class="control"><button class="button is-link" onclick="changeDate()">
+			{% if create %} Create
+			{% elif clone %} Clone
+			{% else %} Update
+			{% endif %}
+		</button></div>
+	</form>
+	{{ form.media }}
+</div>
+
+<div class="box">
+	<h2><b>Preview</b></h2>
+	<hr>
+	<h1 id="title" class="title">Enable javascript!</h1>
+	<p id="date" style="display:none">Exam date: </p>
+	<div id="markdownx"></div>
+</div>
+
+</div>
+
+<script src="{% static 'js/moment.js' %}"></script>
+
+<!---<script href="{% static 'js/highlight.pack.js' %}"></script>-->
+<script>
+	document.getElementById('id_edit_summary').value = "";
+
+	title();
+	document.getElementById('id_title').addEventListener("keyup", title);
+	function title(){
+		document.getElementById('title').innerHTML = document.getElementById('id_title').value;
+	}
+	if(document.getElementById('id_exam_date') != null){
+		date();
+		document.getElementById('id_exam_date').addEventListener("keyup", date);
+		function date(){
+			if(document.getElementById('id_exam_date').value){
+				document.getElementById('date').innerHTML = "Exam date: " + moment(document.getElementById('id_exam_date').value).format('MMMM Do, h:mm a') + " {{ TIME_ZONE}}";
+				document.getElementById('date').style.display = "inherit";
+			}
+		}
+	}
+	function changeDate(){
+		if(document.getElementById('id_exam_date') != null){
+			document.getElementById('id_exam_date').value = "2020-" + moment(document.getElementById('id_exam_date').value).format('MM-DD H:mm:ss');
+		}
+	}
+
+	document.getElementById('id_content').addEventListener("keyup", textFunction);
+	document.getElementById('id_content').addEventListener("blur", textFunction);
+	function textFunction(){
+	 document.querySelectorAll('pre code').forEach((block) => {
+	    hljs.highlightBlock(block);
+	  });
+	 katexMath();
+	}
+
+	var previewBox = document.getElementsByClassName('markdownx-preview')[0];
+	var test = document.getElementsByClassName('test')[0];
+	var newLocation = document.getElementById('markdownx');
+	var ranMove = false;
+
+	document.getElementById('id_content').addEventListener("focus", move);
+	setTimeout(move, 1000);
+	function move() {
+		if(!ranMove && previewBox != null){
+	    	newLocation.appendChild(previewBox);
+	    	ranMove=true;
+	    }
+	    else if(previewBox==null){
+	    	setTimeout(move, 1000);
+	    }
+
+	}
+
+</script>

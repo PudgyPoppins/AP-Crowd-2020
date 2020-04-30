@@ -1,0 +1,128 @@
+<p>Current location: {{ page.parent.get_absolute_url }}</p>
+<p style="margin-bottom:0">New location: <span id="new_location"></span></p>
+
+<input name="path" id="id_path" type=hidden></input>
+
+<div class="field has-addons">
+	<p class="control">
+		<span class="select">
+			<select name="class" id="id_class">
+				{% for c in course_list %}
+					<option value="/{{ c.slug }}" {% if c == course %}selected{% endif %}>/{{ c.slug }}</option>
+				{% endfor %}
+			</select>
+		</span>
+	</p>
+
+	<p class="control">
+		<span class="select">
+			<select name="unit" id="id_unit">
+				<option value="/" id="u1" selected>/</option>
+			</select>
+		</span>
+	</p>
+
+	<p class="control">
+		<span class="select">
+			<select name="sub_unit" id="id_sub_unit">
+				<option value="/" selected>/</option>
+			</select>
+		</span>
+	</p>
+</div>
+<script>
+	var c = document.getElementById('id_class');
+	var u = document.getElementById("id_unit");
+	var s = document.getElementById('id_sub_unit');
+
+	s.addEventListener("change", newPath);
+
+	c.addEventListener("change", units);
+	c.addEventListener("change", subUnits);
+	u.addEventListener("change", subUnits);
+
+	newPath();
+	
+	units();
+	subUnits();
+
+	function units(){
+		while (u.childNodes[2]) { //kill the children, except for the "/" one
+		    u.removeChild(u.childNodes[2]);
+		}
+
+		const url = '/wiki' + c.value + '/_json';
+		var x = ""
+		fetch(url)
+		.then((response) => {
+			return response.json();
+		})
+		.then((data) => {
+			x = data;
+			if({% if request.user.is_staff %}false || {% endif %}x[0].protection == "NC" && x[0].created_by != "{{ request.user.username }}"){document.getElementById('u1').disabled="disabled"; document.getElementById('u1').selected="";}
+
+			var arr = x[0].children;
+			for (i=0; i< arr.length; i++) {
+				var option = document.createElement("option");
+				if(1==1 {% if page.parent == course %}&& arr[i].slug != "{{ page.slug }}"{% endif %}){ //the page can't be moved to itself
+					option.text =  option.value = "/" + arr[i].slug; 
+					u.add(option)
+
+					if(1!=1 {% if page.parent == course %}|| arr[i].slug == "{{ page.slug }}"{% elif page.parent.parent == course %} || arr[i].slug == "{{ page.parent.slug }}"{% endif %}){ //select it if it's the current location
+						option.selected = "selected";
+						subUnits();
+					}
+				}
+			}
+		});
+		newPath();
+	}
+
+	function subUnits(){
+		while (s.childNodes[2]) { //kill the children, except for the "/" one
+		    s.removeChild(s.childNodes[2]);
+		}
+
+		if(u.value != "/" {% if page.parent.parent == course %}&& u.value != "{{ page.parent.slug }}"{% endif %}){
+			s.style.display = "inherit";
+
+			const url = '/wiki' + c.value + u.value + '/_json';
+			var x = ""
+			fetch(url)
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				x = data;
+				if(x[0].children){ //ensures that it actually has children
+					var arr = x[0].children;
+					for (i=0; i< arr.length; i++) {
+						var option = document.createElement("option");
+						if(1==1 {% if page.parent.parent == course %}&& arr[i].slug != "{{ page.slug }}"{% endif %}){ //the page can't be moved to itself
+							option.text =  option.value = "/" + arr[i].slug + "/"; 
+
+							if({% if request.user.is_staff %}false || {% endif %}x[0].protection == "NC" && x[0].created_by != "{{ request.user.username }}"){option.disabled = "disabled";}
+
+							s.add(option);
+							if(1!=1 {% if page.parent.parent == course %}|| arr[i].slug == "{{ page.parent.slug }}" && x[0].parent.slug == "{{ course.slug }}"{% endif %}){ //select it if it's the current location
+								option.selected = "selected";
+							}
+						}
+					}
+				}
+			});
+
+		} else{
+			s.style.display = "none";
+			s.value = "/";
+		}
+		newPath();
+	}
+
+	function newPath(){
+		var str = c.value + u.value;
+		if(u.value != "/"){str+= s.value}
+		document.getElementById('new_location').innerHTML = str;
+		document.getElementById('id_path').value = str;
+	}
+</script>

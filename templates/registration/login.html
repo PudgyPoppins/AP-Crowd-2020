@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+<form method="post">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<button type="submit" class="button is-link">Log in</button>
+</form>
+<h3>Password Requirements, in case you forgot:</h3>
+<ul>
+	<li>Your password can’t be too similar to your other personal information.</li>
+    <li>Your password must contain at least 8 characters.</li>
+    <li>Your password can’t be a commonly used password.</li>
+    <li>Your password can’t be entirely numeric.</li>
+</ul>
+<p>Forgot your password? You can always <a href="{% url 'password_reset' %}">reset it</a>.</p>
+{% endblock %}

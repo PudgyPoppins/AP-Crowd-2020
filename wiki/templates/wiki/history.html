@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+
+<script src="{% static 'js/diffview.js' %}"></script>
+<script src="{% static 'js/difflib.js' %}"></script>
+<script>
+	function diffUsingJS(viewType, baseName, newName) {
+		"use strict";
+		var byId = function (id) { return document.getElementById(id); },
+			base = difflib.stringAsLines(byId("previousContent").innerHTML),
+			newtxt = difflib.stringAsLines(byId("revisionContent").innerHTML),
+			sm = new difflib.SequenceMatcher(base, newtxt),
+			opcodes = sm.get_opcodes(),
+			diffoutputdiv = document.getElementById("diffoutput"),
+			contextSize = "";
+
+		diffoutputdiv = document.getElementById("diffoutput");
+		diffoutputdiv.innerHTML = "";
+		contextSize = contextSize || null;
+
+		diffoutputdiv.appendChild(diffview.buildView({
+			baseTextLines: base,
+			newTextLines: newtxt,
+			opcodes: opcodes,
+			baseTextName: baseName,
+			newTextName: newName,
+			contextSize: contextSize,
+			viewType: viewType
+		}));
+	}
+</script>
+<h1>{{ page.title }} revision history</h1>
+
+{% if page == course %}<p><a href="{% url 'wiki:course_page' page.slug %}"><i class="fas fa-arrow-left arr"></i>back to {{ course.title }}</a></p>
+{% else %}<p><a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-arrow-left arr"></i>back to {{ page.title }}</a></p>
+{% endif %}
+
+<div class="linkWrapper">
+	<a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-eye icn"></i>view</a>
+	{% if page.protection != "LO" and page.protection != "NC" or page.protection == "NC" and user == page.created_by or page.protection == "LO" and user == page.created_by or user.is_staff %}
+	<a href="{% url 'wiki:page_update' page.get_url %}"><i class="fas fa-pen icn"></i>update</a>
+	<a href="{% url 'wiki:page_delete' page.get_url %}"><i class="fas fa-trash icn"></i>delete</a>
+	<a href="{% url 'wiki:page_move' page.get_url %}"><i class="fas fa-arrows-alt icn"></i>move</a>
+	{% endif %}
+	{% if user.is_authenticated %}<a href="{% url 'wiki:page_clone' course.get_url %}"><i class="fas fa-clone icn"></i>clone</a>{% endif %}
+	<a href="{% url 'wiki:page_report' page.get_url %}"><i class="fas fa-flag icn"></i>report</a>
+	<a class="active" href="{% url 'wiki:history' page.get_url %}"><i class="fas fa-history icn"></i>revision history</a>
+	<a href="{% url 'wiki:page_source' page.get_url %}"><i class="fas fa-code icn"></i>view source</a>
+</div>
+
+<h2>Revisions</h2>
+<div>
+	{% for r in page.revision.all %}
+	<div class="revision {% if r.current %}current{% endif %} {% if r.report.all %}reported{% endif %}" onclick="launchModal({{ r.edit_number }})">
+		<div class="wordWrapper">
+			<div><a onclick="launchModal({{ r.edit_number }})">
+				{% if r.current %}<i class="fas fa-star symb textSymb"></i>{% endif %}
+				{% if r.report.all %}<i class="fas fa-flag symb textSymb"></i>{% endif %}
+				{{ r }}
+			</a></div>
+			<em>{% if r.edit_summary %}Edit summary: {{ r.edit_summary }}{% else %}(no edit summary){% endif %}</em>
+			{% if r.report.all %}<span style="display: block">This version has reports associated with it. It's recommended that you view this page first, before reverting.</span>{% endif %}
+		</div>
+		<div class="actionWrapper">
+			{% if r.current %}
+				<a class="button is-dark"><i class="fas fa-star symb" href="{% url 'wiki:page_detail' page.get_url %}"></i>Current version</a>
+				{% else %}
+				<a class="button is-link"><i class="fas fa-eye symb"></i>Preview version</a>
+			{% endif %}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+
+<div class="modal" id="modal">
+	<div class="modal-background" onclick="closeModal()"></div>
+	<div class="modal-content">
+
+		<ul class="messages">
+		    <li class="notification is-info"><strong>Previewing:</strong> <span id="rName"></span>
+		    	<button class="delete is-medium" onclick="closeModal()"></li>
+		</ul>
+
+		<h1 id="title" class="title">Enable javascript!</h1>
+		<p id="location">Location: </p>
+		<p id="date" style="display:none">Exam date: </p>
+		<hr>
+		<div id="content" class="pageContent"></div>
+
+		<div id="revisionContent" class="is-hidden"></div>
+		<div id="previousContent" class="is-hidden"></div>
+
+		<div class="actionWrapper">
+		<a class="button is-link" onclick="closeModal()"><i class="fas fa-arrow-left symb"></i>Back to revision history</a>
+		{% if user.is_authenticated and page.protection == "NO" or page.protection == "CO" and user.is_confirmed or page.protection == "LO" and page.created_by == user or page.protection == "NC" and page.created_by == user  %}
+
+			{% if page != course %}
+				{% if not r.report.all %}<a class="button is-link" id="revertLink"><i class="fas fa-history symb"></i>Revert to this version</a>
+				{% else %}<a class="button is-danger" id="revertLink"><i class="fas fa-history symb"></i>Revert to this reported version</a>
+				{% endif %}
+			{% endif %}
+
+		{% endif %}
+		</div>
+		<h2 id="diffHeader" style="display:none">Differences</h2>
+		<div id="diffoutput"></div>
+
+	</div>
+	<button class="modal-close is-large is-hidden-touch" aria-label="close" onclick="closeModal()"></button>
+</div>
+
+<script>
+	var modal = document.getElementById("modal");
+	var html = document.getElementById("html");
+	function launchModal(num){
+		modal.classList.add("is-active");
+		html.classList.add("is-clipped");
+		getPreview(num);
+	}
+	function closeModal(){
+		modal.classList.remove("is-active");
+		html.classList.remove("is-clipped");
+	}
+	window.onclick = function(event) {
+	  if (event.target == modal) {
+	    closeModal();
+	  }
+	}
+
+	function getPreview(num){
+		{% for r in page.revision.all %}
+		if(num == {{ r.edit_number }}){
+			document.getElementById('rName').innerHTML = "{{ r }}";
+			document.getElementById('title').innerHTML = "{{ r.title }}";
+			document.getElementById('location').innerHTML = "Location: {{ r.location }}";
+			{% if r.exam_date %}
+			document.getElementById('date').innerHTML = "Exam date: {{ r.exam_date }} {{ TIME_ZONE }}";
+			document.getElementById('date').style.display = "block";
+			{% endif %}
+			document.getElementById('content').innerHTML = "{{ r.content|markdownify|escapejs }}";
+
+			document.getElementById('revertLink').setAttribute('href', "{% url 'wiki:page_detail' page.get_url %}_revert/{{ r.edit_number }}");
+			//for the diff function:
+			{% if r.get_previous %}
+			document.getElementById('diffHeader').style.display = "block";
+			document.getElementById('revisionContent').innerHTML = "{{ r.content|escapejs }}";
+			document.getElementById('previousContent').innerHTML = "{{ r.get_previous_content|escapejs }}";
+			diffUsingJS(1, '#{{r.get_previous.edit_number}}', '#{{ r.edit_number }}');
+			{% else %}
+			document.getElementById('diffHeader').style.display = "none";
+			{% endif %}
+
+		};
+		{% endfor %}
+	}
+</script>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<h1 class='title'>{{ course.title }}</h1>
+{% if course.exam_date %}<h3>Exam date: {{ course.exam_date }} {{ TIME_ZONE}}</h3>
+{% endif %}
+
+<a href="{% url 'wiki:course_list' %}"><i class="fas fa-arrow-left arr"></i>back to course list</a>
+
+<p class="protection">Page protection:
+{% if course.protection == "LO" %}<i class="fas fa-lock icn"></i>Locked <span data-tooltip="Only the user who locked this page can edit it" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif course.protection == "NC" %}<i class="fas fa-lock icn"></i>Locked and doesn't allow children <span data-tooltip="Only the user who locked this page can edit it, and no more pages can be added here" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif course.protection == "CO" %}<i class="fas fa-lock icn"></i>Confirmed users only <span data-tooltip="Only users who have had an account for 5 days can edit this page" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% elif course.protection == "NO" %}<i class="fas fa-unlock icn"></i>None <span data-tooltip="All signed in users can edit this page" class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>
+{% endif %}
+</p>
+
+<div class="linkWrapper">
+	<a class="active" href="{% url 'wiki:course_page' course.slug %}"><i class="fas fa-eye icn"></i>view</a>
+	{% if course.protection != "LO" and course.protection != "NC" or course.protection == "NC" and user == course.created_by or course.protection == "LO" and user == course.created_by or user.is_staff %}
+	<a href="{% url 'wiki:page_update' course.get_url %}"><i class="fas fa-pen icn"></i>update</a>
+	{% endif %}
+	{% if user.is_authenticated %}<a href="{% url 'wiki:page_clone' course.get_url %}"><i class="fas fa-clone icn"></i>clone</a>{% endif %}
+	<a href="{% url 'wiki:page_report' course.get_url %}"><i class="fas fa-flag icn"></i>report</a>
+	<a href="{% url 'wiki:history' course.get_url %}"><i class="fas fa-history icn"></i>revision history</a>
+	<a href="{% url 'wiki:page_source' course.get_url %}"><i class="fas fa-code icn"></i>view source</a>
+</div>
+
+{% if course.protection != "LO" and course.protection != "NC" or course.protection == "NC" and user == course.created_by or course.protection == "LO" and user == course.created_by or user.is_staff %}
+{% else %}<p>This course has been locked and can no longer be edited.</p> 
+<p>If you beleive this course page would benefit from more information, you can <a href="{% url 'wiki:page_report' course.get_url %}">file a report</a> against it.</p>
+{% endif %}
+
+{% if r %}<p>Last edited by: <a href="{% url 'accounts:profile' r.created_by.username %}">{{ r.created_by }}</a>, {{ r.created_date|timesince }} ago</p>{% endif %}
+
+
+<h2>Units</h2>
+{% if course.child.all %}
+<ul>
+	{% for u in course.child.all %}
+	<li><a href="{% url 'wiki:page_detail' u.get_url %}">{{ u.title }}</a></li>
+	{% endfor %}
+</ul>
+{% if course.protection != "NC" or course.protection == "NC" and user.is_authenticated and user == course.created_by or user.is_staff %}<a href="{% url 'wiki:page_create' course.get_url %}">add another unit</a></p>{% endif %}
+
+{% else %}
+	{% if course.protection == "NO" or course.protection == "CO" and user.is_authenticated and user.is_confirmed or course.protection == "LO" and user.is_authenticated and user == course.created_by or course.protection == "NC" and user.is_authenticated and user == course.created_by %}<p>This class doesn't have any units created, yet. Be the first to <a href="{% url 'wiki:page_create' course.get_url %}">add a unit</a>.</p>
+	{% else %}<p>This class doesn't have any created units.</p>
+	{% endif %}
+{% endif %}
+<hr>
+<div class="pageContent">{{ course.content|markdownify }}</div>
+{% endblock %}

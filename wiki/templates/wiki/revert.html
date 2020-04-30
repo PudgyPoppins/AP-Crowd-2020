@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Revert {{ page.title }}{% endblock %}
+
+{% block not_content %}
+{% include "wiki/snippets/form_links.html" %}
+<div class="box">
+	<h1>Revert {{ page.title }}</h1>
+	<form method="post">{% csrf_token %}
+		<p>Revert {{ page.title }} to version {{ r.edit_number }}?</p>
+
+		{% if page.parent != parent or parentDNE %}
+		<p><strong>This revision has a different location from the current page. Reverting to this version will break all links associated with the page. It is strongly recommended that you keep this page's current location.</strong></p>
+		{% include "wiki/snippets/move_snippet.html" %}
+		
+		{% elif page.slug != r.slug %}
+		<p><strong>This revision has a different slug from the current page. Reverting to this version will break all links associated with the page. It is strongly recommended that you keep this page's current slug.</strong></p>
+		<p>Slug:</p>
+		<p><input type="text" name="slug" value="{{ page.slug }}" maxlength="115" id="id_slug"></p>
+		{% endif %}
+		<div class="control"><button class="button is-link">Revert</button></div>
+	</form>
+</div>
+
+<div class="box">
+	<h2><b>Preview</b></h2>
+	<hr>
+	<h1 class="title">{{ r.title }}</h1>
+	<p>Location: {{ r.location }}</p>
+	<p>Slug: {{ r.slug }}</p>
+	{% if r.exam_date %}<p>Exam date: {{ r.exam_date }} {{ TIME_ZONE }}</p>{% endif %}
+	<hr>
+	<div id="pageContent">{{ r.content|markdownify }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Report {{ page.title }}{% endblock %}
+
+{% block not_content %}
+
+<div class="formPageWrapper">
+{% if page != course %}<p><a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-arrow-left arr"></i>back to page</a></p>
+{% else %}<p><a href="{% url 'wiki:course_page' course.slug %}"><i class="fas fa-arrow-left arr"></i>back to course page</a></p>
+{% endif %}
+
+<div class="linkWrapper">
+	<a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-eye icn"></i>view</a>
+	{% if page.protection != "LO" and page.protection != "NC" or page.protection == "NC" and user == page.created_by or page.protection == "LO" and user == page.created_by or user.is_staff %}
+	<a href="{% url 'wiki:page_update' page.get_url %}"><i class="fas fa-pen icn"></i>update</a>
+	<a href="{% url 'wiki:page_delete' page.get_url %}"><i class="fas fa-trash icn"></i>delete</a>
+	<a href="{% url 'wiki:page_move' page.get_url %}"><i class="fas fa-arrows-alt icn"></i>move</a>
+	{% endif %}
+	{% if user.is_authenticated %}<a href="{% url 'wiki:page_clone' course.get_url %}"><i class="fas fa-clone icn"></i>clone</a>{% endif %}
+	<a class="active" href="{% url 'wiki:page_report' page.get_url %}"><i class="fas fa-flag icn"></i>report</a>
+	<a href="{% url 'wiki:history' page.get_url %}"><i class="fas fa-history icn"></i>revision history</a>
+	<a href="{% url 'wiki:page_source' page.get_url %}"><i class="fas fa-code icn"></i>view source</a>
+</div>
+</div>
+
+<div class="box">
+	<h1>Report {{ page.title }}</h1>
+	<form method="post">{% csrf_token %}
+		<p>
+			{% for check in form.reason %}
+			<div>
+			    {{ check }}
+			</div>
+			{% endfor %}
+		</p>
+		{% for field in form %}
+			<p>
+				{% if field.name != "reason" %}
+				{{ field.errors }} 
+				{{ field.label_tag }}
+				<div class="formRow">
+					{{ field }}
+					{% if field.help_text %}
+					<span data-tooltip="{{ field.help_text|safe }}" class="helptext is-hidden-touch tooltip-left" tabindex="0"><i class="fas fa-question-circle"></i></span>
+					<span class="helptext is-hidden-desktop">{{ field.help_text|safe }}</span>
+					{% endif %}
+				</div>
+				{% if not field.field.required %}
+				<i>(optional)</i>
+				{% endif %}
+				{% endif %}
+			</p>
+		{% endfor %}
+
+		<div class="control"><button class="button is-link">
+			Report
+		</button></div>
+	</form>
+	{{ form.media }}
+</div>
+{% endblock %}

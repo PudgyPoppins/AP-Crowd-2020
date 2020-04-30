@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ page.title }}{% endblock %}
+
+{% block not_content %}
+<div class="formPageWrapper">
+	<p><a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-arrow-left arr"></i>back to page</a></p>
+
+	<div class="linkWrapper">
+		<a href="{% url 'wiki:page_detail' page.get_url %}"><i class="fas fa-eye icn"></i>view</a>
+		{% if page.protection != "LO" and page.protection != "NC" or page.protection == "NC" and user == page.created_by or page.protection == "LO" and user == page.created_by or user.is_staff %}
+		<a href="{% url 'wiki:page_update' page.get_url %}"><i class="fas fa-pen icn"></i>update</a>
+		<a href="{% url 'wiki:page_delete' page.get_url %}" class="active"><i class="fas fa-trash icn"></i>delete</a>
+		<a href="{% url 'wiki:page_move' page.get_url %}"><i class="fas fa-arrows-alt icn"></i>move</a>
+		{% endif %}
+		{% if user.is_authenticated %}<a href="{% url 'wiki:page_clone' course.get_url %}"><i class="fas fa-clone icn"></i>clone</a>{% endif %}
+		<a href="{% url 'wiki:page_report' page.get_url %}"><i class="fas fa-flag icn"></i>report</a>
+		<a href="{% url 'wiki:history' page.get_url %}"><i class="fas fa-history icn"></i>revision history</a>
+		<a href="{% url 'wiki:page_source' page.get_url %}"><i class="fas fa-code icn"></i>view source</a>
+	</div>
+</div>
+
+<div class="box">
+	<h1>Delete page</h1>
+	<form method="post">{% csrf_token %}
+		<p>Are you <em>sure</em> that you want to delete the page <em>{{ page.title }}</em>?</p>
+		<p>Any links to this page will no longer function.</p>
+
+		<p><strong><em>This action cannot be undone!</em></strong></p>
+
+		<div class="control"><button class="button is-danger">
+			Delete forever
+		</button></div>
+	</form>
+	{{ form.media }}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{profile.username}}{% endblock %}
+
+{% block content %}
+
+<h2>User: {{ profile.username }}</h2>
+{% if profile.display_name %}<h3>{{ profile.display_name }}</h3>{% endif %}
+
+{% if user.username == profile.username %}<a href="{% url 'password_reset' %}">reset password</a>{% endif %}
+
+{% if user.username == profile.username or perms.accounts.update_user %}
+<a href="{% url 'accounts:update_user' profile.username %}">edit profile</a>
+{% endif %}
+
+{% if user.username == profile.username or perms.accounts.delete_user %}
+<a href="{% url 'accounts:delete_user' profile.username %}">delete account</a>
+{% endif %}
+
+<h3>Edited / Created Pages</h3>
+{% if created_pages %}
+	<ul>
+	{% for r in created_pages %}
+		<li>
+			<a href="{% url 'wiki:page_detail' r.page.get_url %}">{{ r.page.get_absolute_url }}</a>
+		</li>
+	{% endfor %}
+	</ul>
+{% else %}
+	{% if user.username == profile.username %}<p>You haven't contributed to any pages yet.</p>
+	{% else %}<p>This user hasn't created any pages yet.</p>
+	{% endif %}
+{% endif %}
+{% endblock %}
