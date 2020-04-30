@@ -20,16 +20,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# the following key shown below is only used in localhost. Knowing it isn't a security compromise.
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'xhpe^oa6c6su+msn3ej6--w08%n0o@xdjp16z4n5fodu9ts0g@')
+with open('SECRET_KEY.text') as f:
+    SECRET_KEY = f.read().strip()
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+with open('DEBUG.text') as f:
+    DEBUG = f.read().strip() != 'False'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'apcrowd2020.com', 'www.apcrowd2020.com', 'blooming-coast-63759.herokuapp.com']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.179', 'apcrowd2020.com', 'www.apcrowd2020.com', '98.202.253.23', 'physics.hostless.org']
+#ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -166,7 +167,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 #SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
 #SECURE_REFERRER_POLICY = "same-origin"
 
 
@@ -182,6 +183,3 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
