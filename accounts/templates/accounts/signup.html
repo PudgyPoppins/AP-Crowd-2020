@@ -7,7 +7,7 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <p>I'm not very good with computers, so make sure that you use a unique password. There's not a whole lotta security in this application</p>
-    <button type="submit">Sign up</button>
+    <p>It's very important to choose a secure password that you don't share with others!</p>
+    <button type="submit" class="button is-link">Sign up</button>
   </form>
 {% endblock %}

@@ -10,8 +10,8 @@ class StaticSitemap(Sitemap):
      def items(self):
         mylist = [ ]
         for url in pageUrls:
-            mylist.append('page:'+url.name) 
+            mylist.append(url.name) 
         return mylist
 
      def location(self, item):
-         return reverse(item)
+         return reverse('pages:' + item)

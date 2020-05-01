@@ -27,21 +27,20 @@ from wiki.sitemaps import *
 from pages.sitemaps import *
 
 sitemaps = {
+   'static': StaticSitemap(),
    'pages': PageSitemap(),
-   #'static': StaticSitemap(),
 }
 
 urlpatterns = [
 	path('', include('pages.urls')),
-	#path('wiki/', include('application.urls')),
     path('wiki/', include('wiki.urls')),
-    #path('test/', include('mardownx.urls')),
     path('markdownx/', include('markdownx.urls')),
 
 	path('admin/', admin.site.urls),
 	path('accounts/', include('accounts.urls')),
 	path('accounts/', include('django.contrib.auth.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler403 = 'pages.views.handler403'

@@ -14,5 +14,5 @@ class TimezoneMiddleware:
 			else:
 				timezone.deactivate()
 		except:
-			timezone.activate('America/Denver')
+			timezone.activate('US/Eastern')
 		return self.get_response(request)

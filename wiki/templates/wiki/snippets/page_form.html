@@ -33,7 +33,7 @@
 			{% if field.name == "slug" and clone %}<p class="moveWrapper">{% include "wiki/snippets/move_snippet.html" %}</p>{% endif %}
 		{% endfor %}
 
-		<p><i>By submitting this form, you irrevocably agree to release your contribution under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0 License</a><span style="margin-left:5px" data-tooltip="This means that while your contribution is available for others to use and reuse, they can't use it for commercial purposes." class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>. 
+		<p><i>By submitting this form, you agree to the <a href="{% url 'pages:tos' %}">Terms of Service</a>, and you irrevocably agree to release your contribution under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0 License</a><span style="margin-left:5px" data-tooltip="This means that while your contribution is available for others to use and reuse, they can't use it for commercial purposes." class="helptext is-hidden-touch" tabindex="0"><i class="fas fa-question-circle"></i></span>. 
 		You agree that a hyperlink or URL is sufficient attribution under the Creative Commons license.</i></p>
 		
 		<p><span class="helptext is-hidden-desktop">This means that while your contribution is available for others to use and reuse, they can't use it for commercial purposes</span></p>

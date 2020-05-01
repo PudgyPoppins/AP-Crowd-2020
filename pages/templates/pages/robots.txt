@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: 
+Disallow: /admin/
+Disallow: /sitemap.xml
+Disallow: /courses/_add
+Sitemap: https://apcrowd2020.com/sitemap.xml

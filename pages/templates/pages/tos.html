@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service{% endblock %}
+
+{% block content %}
+<div class="block">
+<h1 class="title">Terms of Service</h1>
+
+<p><a href="{% url 'pages:main' %}"><i class="fas fa-arrow-left arr"></i>back to home</a> | <a href="{% url 'pages:privacy' %}">Privacy Policy</a></p>
+
+<div class="pageContent">
+	<h2>Human readable section</h2>
+	<p>Please don't sue us, make any copyright infringements, or violate the rules of this site. Also, we can ban you whenever we want without warning.</p>
+	<p>Thus ends the human readable section and begins the legally binding Terms of Service.</p>
+	<hr>
+	<h2>Definitions</h2>
+	<ol>
+		<li>"AP Crowd,", "the site", "We," and "Us" refer to the service AP Crowd 2020 found on <a href="/">https://apcrowd2020.com</a>.</li>
+		<li>"You", and "the User", refer to the reader of this document.</li>
+		<li>"Contribution" refer to the images, text, markdown, and content uploaded or shared by the User on this website in any form, including but not limited to page edits, page creations, and page clones.</li>
+	</ol>
+
+	<h2>You are legally responsible</h2>
+	<p>You are legally responsible for your edits and contributions on AP Crowd, so for your own protection you should exercise caution and avoid contributing any content that may result in criminal or civil liability under any applicable laws. For clarity, applicable law includes at least the laws of the United States of America</p>
+
+	<h2>Privacy policy</h2>
+	<p>By using this site, you also agree to the <a href="{% url 'pages:privacy' %}">Privacy Policy</a>.</p>
+
+	<h2>Password Security</h2>
+	<p>You are responsible for safeguarding your own password and should never disclose it to any third party.</p>
+
+	<h2>User deletion</h2>
+	<p>AP Crowd, in its sole discretion, has the right to suspend or terminate any account and refuse any and all current or future use of the website, for any reason at any time. We reserve the right to refuse service to anyone for any reason at any time.</p>
+
+	<h2>Licensing of Content</h2>
+	<p>When you submit text to which you hold the copyright, you agree to license it under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Attribution-NonCommercial-ShareAlike 4.0 International</a>, otherwise known as a "CC BY-NC-SA 4.0" liscence or "CC BY-NC-SA". This commitment is irrevocable.</p>
+	<p>You also agree to properly attribute any media or text that you upload, share, or contribute. If such contribution is not liscenced for use in the context of this site, and under the CC-BY-NC-SA liscence, then the User assumes all liability and responsibility of uploading such content. Attribution, if applicable, must at a minimum include a hyperlink to the source.</p>
+	<p>NEVER use materials that infringe the copyrights of others. This could create legal liabilities for You and for AP Crowd. If in doubt, create the content yourself to avoid such issues.</p>
+
+	<h2>Disputes and Jurisdiction</h2>
+	<p>If you seek to file a legal claim against us, you agree to file and resolve it exclusively in a state or federal court located in San Francisco County, California. You also agree that the laws of the State of California and, to the extent applicable, the laws of the United States of America will govern these Terms of Use, as well as any legal claim that might arise between you and us (without reference to conflict of laws principles). You agree to submit to the personal jurisdiction of, and agree that venue is proper in, the courts located in San Francisco County, California, in any legal action or proceeding relating to us or these Terms of Use. </p>
+	<p>You agree that regardless of any statute or law to the contrary, any claim or cause of action you might have arising out of or related to use of our services or these Terms of Use must be filed within the applicable statute of limitations or, if earlier, one (1) year after the pertinent facts underlying such claim or cause of action could have been discovered with reasonable diligence (or be forever barred).</p>
+
+	<h2>Limitation on Liability</h2>
+	<p>AP Crowd 2020 will not be liable to you or to any other party for any direct, indirect, incidental, special, consequential or exemplary damages, including but not limited to, damages for loss of profits, goodwill, use, data, or other intangible losses, regardless of whether we were advised of the possibility of such damage. In no event shall our liability exceed one hundred U.S. dollars (USD 100.00) in aggregate. In the case that applicable law may not allow the limitation or exclusion of liability or incidental or consequential damages, the above limitation or exclusion may not apply to you, although our liability will be limited to the fullest extent permitted by applicable law.</p>
+
+	<h2>Modifications to these Terms of Use</h2>
+	<p>It is the responsibility of the User to check frequently this page and see if any changes have been made to this page. You are responsible for reading this Terms of Use, whenever it changes, whether with or with out warning.</p>
+</div>
+</div>
+{% endblock %}

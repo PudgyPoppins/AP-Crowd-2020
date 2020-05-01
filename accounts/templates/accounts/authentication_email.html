@@ -1,0 +1,7 @@
+{% autoescape off %}
+Hi {{ user.username }}!
+Please click on the link to confirm your registration,
+https://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}
+
+Also, remember to check out our https://apcrowd2020.com{% url 'pages:index' %}#rules rules, too!
+{% endautoescape %}

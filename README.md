@@ -5,3 +5,5 @@ What this is:
 
 You can help, if you want, first and foremost by adding content in the form of notes!
 Furthermore, if you notice any errors, you can log an issue in the github repo :)
+
+Note that this repository may be several changes behind what is actually on the current version of the site.

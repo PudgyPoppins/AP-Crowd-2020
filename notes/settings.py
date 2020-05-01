@@ -29,7 +29,7 @@ with open('SECRET_KEY.text') as f:
 with open('DEBUG.text') as f:
     DEBUG = f.read().strip() != 'False'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.179', 'apcrowd2020.com', 'www.apcrowd2020.com', '98.202.253.23', 'physics.hostless.org']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.179', 'apcrowd2020.com', 'www.apcrowd2020.com', '98.202.253.23']
 #ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'compressor',
     'markdownx',
+    'captcha',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -121,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Eastern'
 
 USE_I18N = True
 
@@ -166,10 +167,15 @@ AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-#SESSION_COOKIE_SECURE = True
-#CSRF_COOKIE_SECURE = True
+#SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 #SECURE_REFERRER_POLICY = "same-origin"
 
+RECAPTCHA_PUBLIC_KEY = '6LerzvAUAAAAAB6R5-Kv5ddRPXFzeTKqSpX-50zI'
+with open('GOOGLE_SECRET_KEY.text') as f:
+    RECAPTCHA_PRIVATE_KEY = f.read().strip()
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
 ADMINS = [('Admin', 'apcrowd2020@gmail.com'),]
 
@@ -177,7 +183,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'apcrowd2020@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+with open('EMAIL_PASS.text') as f:
+    EMAIL_HOST_PASSWORD = f.read().strip()
 
 # Heroku: Update database configuration from $DATABASE_URL.
 import dj_database_url

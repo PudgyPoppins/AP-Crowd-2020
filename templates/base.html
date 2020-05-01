@@ -33,7 +33,7 @@
 	<meta name="twitter:card" content="summary">
 	<meta name="twitter:description" content="AP Crowd 2020 is a place for students to share crowdsourced notes for this year's AP exams.">
 
-	<title>AP Crowd {% block title %}{% endblock %}</title>
+	<title>APC | {% block title %}AP® Crowd 2020{% endblock %}</title>
 
 	{% compress css %}
 	<link type="text/x-sass" href="{% static 'css/bulma.sass' %}" rel="stylesheet">
@@ -117,10 +117,9 @@
 			</div>
 			{% endif %}
 			<div class="toc">
-				<span>Print/export</span>
+				<span>Print</span>
 				<ul>
 					<li><a href="#" onclick="window.print();return false;">Printable version</a></li>
-					<li>For a PDF, use the <a href="#" onclick="window.print();return false;">above link</a>, and, when prompted, change "Destination" to "Save as PDF"</li>
 				</ul>
 			</div>
 		</div>
@@ -142,7 +141,7 @@
 	  <div class="content">
 	  	<p>AP® is a registered trademark of the College Board, which has not reviewed this resource.</p>
 	    <p>
-	      The <a href="https://github.com/PudgyPoppins/AP-Crowd-2020" target="_blank">source code</a> for <strong>AP Crowd 2020</strong> is licensed under
+	      The <a href="https://github.com/PudgyPoppins/AP-Crowd-2020" target="_blank">source code</a> for <strong>AP® Crowd 2020</strong> is licensed under
 	      <a href="http://opensource.org/licenses/mit-license.php" target="_blank">MIT</a>. The website content
 	      is licensed <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
 	    </p>
@@ -158,6 +157,7 @@
 		  	<a href="https://twitter.com/intent/tweet?url=http%3A%2F%2Fapcrowd2020.com&amp;text=AP%20Crowd%202020%3A%20A%20crowdsourced%20notes%20application%20for%20this%20year's%20AP%20exams" target="_blank"><i class="fab fa-twitter icn"></i>Twitter</a>
 		  </div>
 		</div>
+	<p style="font-size:14px; margin-bottom:0; color:#292929;">By using this site, you agree to the <a href="{% url 'pages:tos' %}" class="alt-a">Terms of Service</a> and <a href="{% url 'pages:privacy' %}" class="alt-a">Privacy Policy</a>.</p>
 	</footer>
 
 

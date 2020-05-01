@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-#from django.db.models import Q
+from django.contrib.auth import login, authenticate
+
 from .forms import *
 from .models import User
 from django.urls import reverse_lazy, reverse
@@ -12,6 +13,18 @@ from django.contrib.auth.views import LoginView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import never_cache
+
+
+
+import json
+import urllib
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
+from django.core.mail import EmailMessage
 
 from django.contrib import messages
 
@@ -28,6 +41,43 @@ class SignUp(generic.CreateView):
 			return HttpResponseRedirect(reverse('pages:main'))
 		else:
 			return super().dispatch(*args, **kwargs)
+	def form_valid(self, form):
+		user = form.save(commit=False)
+		user.is_active = False
+		user.save()
+		current_site = get_current_site(self.request)
+		mail_subject = 'Activate your account on AP Crowd 2020'
+		message = render_to_string('accounts/authentication_email.html', {
+			'user': user,
+			'domain': current_site.domain,
+			'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+			'token':account_activation_token.make_token(user),
+		})
+		to_email = form.cleaned_data.get('email')
+		email = EmailMessage(
+			mail_subject, message, to=[to_email]
+		)
+		email.send()
+		messages.info(self.request, "A verification link should arrive shortly to your email address.")
+		messages.info(self.request, "Check your spam folder!")
+		 
+		return super().form_valid(form)
+
+def activate(request, uidb64, token):
+	try:
+		uid = force_text(urlsafe_base64_decode(uidb64))
+		user = User.objects.get(pk=uid)
+	except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+	if user is not None and account_activation_token.check_token(user, token):
+		user.is_active = True
+		user.save()
+		login(request, user)
+		messages.success(request, "Successfully logged in!")
+		return HttpResponseRedirect(reverse('pages:main'))
+	else:
+		messages.error(request, "Invalid activation link!")
+		return HttpResponseRedirect(reverse('pages:index'))
 
 class Login(LoginView):
 	redirect_authenticated_user = True #overrided the class so that now logging in automatically redirects back to main
@@ -81,12 +131,7 @@ def delete_user(request, username):
 		if request.method =="POST": 
 			obj.delete() #delete object
 
-			#redirects:
-			if request.user.has_perm('accounts.delete_user'):
-				messages.success(request, "User deleted successfully")
-				return HttpResponseRedirect(reverse('home:main')) #the user is an admin / moderator, don't bring them to login view
-			else:
-				return reverse('login')
+			return reverse('login')
   
 	return render(request, "accounts/user_confirm_delete.html", {"object": obj})
 
