@@ -18,7 +18,7 @@ libsass==0.19.4
 Mako==1.0.7
 Markdown==3.2.1
 #MarkupSafe==1.0
-Pillow==7.1.1
+Pillow==8.3.2
 psycopg2-binary==2.8.5
 pycrypto==2.6.1
 python-dateutil==2.6.1
